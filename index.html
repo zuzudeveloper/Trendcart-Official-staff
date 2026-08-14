@@ -1,308 +1,391 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trendcart Official — Control Center</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f8fafc}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:20px}
-.nav{transition:.18s}.nav.active{background:#eff6ff;color:#2563eb}
-.modal{display:none}.modal.open{display:flex}
-input,textarea,select{outline:none} input:focus,textarea:focus,select:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #dbeafe}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <title>Trendcart Official — Staff Control Center 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ["Inter","ui-sans-serif","system-ui"] } } }
+    };
+  </script>
+  <style>
+    :root{--navy:#07111f;--bg:#f5f7fb;--teal:#00A8BD;--amber:#FFA800;--blue:#2563eb;--line:#e5eaf1}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:#0b1220;font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
+    button,input,textarea,select{font:inherit} button{cursor:pointer}.safe-top{padding-top:max(10px,env(safe-area-inset-top))}.safe-bottom{padding-bottom:max(12px,env(safe-area-inset-bottom))}
+    .glass{background:rgba(255,255,255,.72);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border:1px solid rgba(255,255,255,.82);box-shadow:0 14px 40px rgba(15,23,42,.08),inset 0 1px rgba(255,255,255,.9)}
+    .glass-dark{background:rgba(7,17,31,.82);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);border:1px solid rgba(255,255,255,.12)}
+    .wordmark{font-family:"Bodoni 72","Didot","Bodoni MT","Times New Roman",serif;font-weight:900;font-style:italic;letter-spacing:.1em;transform:skewX(-3deg);animation:glow 2.8s ease-in-out infinite}
+    .teal{color:var(--teal)} .amber{color:var(--amber)}
+    @keyframes glow{0%,100%{opacity:.88;text-shadow:0 0 0 rgba(0,168,189,0)}50%{opacity:1;text-shadow:0 0 14px rgba(0,168,189,.28);transform:skewX(-3deg) scale(1.015)}}
+    .fade{animation:fade .3s ease both}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .drawer{transform:translateX(-105%);transition:transform .25s ease}.drawer.open{transform:translateX(0)}
+    .modal{opacity:0;visibility:hidden;transition:.2s ease}.modal.open{opacity:1;visibility:visible}.modal .sheet{transform:translateY(30px);transition:.25s ease}.modal.open .sheet{transform:none}
+    .nav-active{background:rgba(0,168,189,.12);color:#00899b;border-color:rgba(0,168,189,.2)}
+    .switch{width:42px;height:24px;border-radius:99px;background:#cbd5e1;padding:3px;transition:.2s}.switch i{display:block;width:18px;height:18px;background:white;border-radius:50%;transition:.2s;box-shadow:0 2px 5px #0002}.switch.on{background:var(--teal)}.switch.on i{transform:translateX(18px)}
+    .scrollbar::-webkit-scrollbar{width:7px;height:7px}.scrollbar::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:99px}
+    @media(min-width:1024px){.sidebar-fixed{display:flex}.mobile-menu{display:none!important}}
+  </style>
 </head>
-<body class="text-slate-900">
-<div id="loginGate" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-5">
- <div class="bg-white rounded-3xl p-7 w-full max-w-md">
-  <div class="text-xs font-black uppercase tracking-[.2em] text-blue-600">Trendcart Official</div>
-  <h1 class="text-3xl font-black mt-2">Control Center</h1>
-  <p class="text-sm text-slate-500 mt-2">Sign in with an authorized Firebase account to manage the live store.</p>
-  <input id="adminEmail" type="email" placeholder="Admin email" class="w-full mt-6 p-3 rounded-xl border">
-  <input id="adminPassword" type="password" placeholder="Password" class="w-full mt-3 p-3 rounded-xl border">
-  <button id="loginBtn" class="w-full mt-4 h-12 rounded-xl bg-blue-600 text-white font-black">Sign in</button>
-  <p id="loginError" class="text-sm text-red-600 mt-3"></p>
- </div>
-</div>
-
-<div class="min-h-screen flex">
-<aside class="w-64 bg-white border-r p-4 hidden lg:block">
- <div class="text-xl font-black mb-7">Trendcart Control</div>
- <div class="space-y-1">
-  <button class="nav active w-full text-left p-3 rounded-xl" data-page="dashboard">Dashboard</button>
-  <button class="nav w-full text-left p-3 rounded-xl" data-page="orders">Orders</button>
-  <button class="nav w-full text-left p-3 rounded-xl" data-page="products">Products</button>
-  <button class="nav w-full text-left p-3 rounded-xl" data-page="reels">Reels / Videos</button>
-  <button class="nav w-full text-left p-3 rounded-xl" data-page="offers">Offers</button>
-  <button class="nav w-full text-left p-3 rounded-xl" data-page="customers">Customers</button>
- </div>
- <button id="logoutBtn" class="mt-8 w-full p-3 rounded-xl bg-slate-100 font-bold text-sm">Sign out</button>
-</aside>
-
-<main class="flex-1 min-w-0">
-<header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b px-4 py-4 flex items-center justify-between">
- <div><h2 id="pageTitle" class="text-xl font-black">Dashboard</h2><p id="pageSubtitle" class="text-xs text-slate-500">Live Firebase store control</p></div>
- <div class="flex items-center gap-2">
-  <span id="live" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold"><i class="w-2 h-2 rounded-full bg-emerald-500"></i>LIVE</span>
-  <button id="refreshBtn" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-black">Refresh</button>
- </div>
-</header>
-
-<div class="lg:hidden sticky top-[73px] z-20 bg-white border-b p-2 overflow-x-auto">
- <div class="flex gap-2 min-w-max">
-  <button class="nav active px-4 py-2 rounded-xl text-sm font-bold" data-page="dashboard">Dashboard</button>
-  <button class="nav px-4 py-2 rounded-xl text-sm font-bold" data-page="orders">Orders</button>
-  <button class="nav px-4 py-2 rounded-xl text-sm font-bold" data-page="products">Products</button>
-  <button class="nav px-4 py-2 rounded-xl text-sm font-bold" data-page="reels">Reels</button>
-  <button class="nav px-4 py-2 rounded-xl text-sm font-bold" data-page="offers">Offers</button>
-  <button class="nav px-4 py-2 rounded-xl text-sm font-bold" data-page="customers">Customers</button>
- </div>
-</div>
-
-<div class="p-4 sm:p-6 max-w-7xl mx-auto">
-
-<section id="page-dashboard" class="page">
- <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
-  <div class="card p-5"><p class="text-xs text-slate-500">Orders</p><b id="sOrders" class="text-3xl">0</b></div>
-  <div class="card p-5"><p class="text-xs text-slate-500">Pending</p><b id="sPending" class="text-3xl">0</b></div>
-  <div class="card p-5"><p class="text-xs text-slate-500">Delivered</p><b id="sDelivered" class="text-3xl">0</b></div>
-  <div class="card p-5"><p class="text-xs text-slate-500">Products</p><b id="sProducts" class="text-3xl">0</b></div>
-  <div class="card p-5"><p class="text-xs text-slate-500">Sales</p><b id="sSales" class="text-3xl">₹0</b></div>
- </div>
- <div class="card p-5 mt-5">
-  <div class="flex justify-between items-center"><h3 class="text-lg font-black">Latest Orders</h3><button onclick="go('orders')" class="text-sm font-bold text-blue-600">View all</button></div>
-  <div id="latestOrders" class="mt-4 space-y-3"></div>
- </div>
-</section>
-
-<section id="page-orders" class="page hidden">
- <div class="flex flex-col md:flex-row gap-3 mb-4">
-  <input id="orderSearch" placeholder="Search order, phone, customer..." class="flex-1 p-3 rounded-xl border">
-  <select id="orderStatusFilter" class="p-3 rounded-xl border"><option value="">All statuses</option><option>pending</option><option>confirmed</option><option>processing</option><option>shipped</option><option>delivered</option></select>
- </div>
- <div id="ordersList" class="space-y-3"></div>
-</section>
-
-<section id="page-products" class="page hidden">
- <div class="card p-5">
-  <div class="flex justify-between items-center gap-3"><div><h3 class="text-lg font-black">Live Products</h3><p class="text-sm text-slate-500">Changes are written directly to Firestore.</p></div><button onclick="openProduct()" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-black">+ Add product</button></div>
-  <input id="productSearch" placeholder="Search products..." class="w-full mt-4 p-3 rounded-xl border">
-  <div id="productsList" class="mt-4 grid sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
- </div>
-</section>
-
-<section id="page-reels" class="page hidden">
- <div class="card p-5">
-  <h3 class="text-lg font-black">Reels / Video Feed</h3>
-  <p class="text-sm text-slate-500 mt-1">The customer site reads <b>videoUrl</b> from products. Add or change it here to control the existing Reels feed.</p>
-  <div class="grid md:grid-cols-3 gap-3 mt-5">
-   <select id="reelProduct" class="p-3 rounded-xl border"></select>
-   <input id="reelUrl" placeholder="https://... video URL" class="p-3 rounded-xl border">
-   <button onclick="saveReel()" class="rounded-xl bg-blue-600 text-white font-black">Save Reel</button>
+<body>
+  <div id="loginScreen" class="min-h-screen grid place-items-center px-4 py-10 bg-[radial-gradient(circle_at_20%_10%,rgba(0,168,189,.15),transparent_30%),radial-gradient(circle_at_90%_80%,rgba(37,99,235,.12),transparent_30%)]">
+    <div class="glass w-full max-w-md rounded-[2rem] p-7 sm:p-9 fade">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-12 h-12 rounded-2xl glass-dark grid place-items-center text-white font-black">TC</div>
+        <div><div class="wordmark text-xl teal">TRENDCART <span class="amber">OFFICIAL</span></div><div class="text-xs text-slate-500 font-bold mt-1">Staff Control Center</div></div>
+      </div>
+      <h1 class="text-2xl font-black">Admin Control Center</h1>
+      <p class="text-sm text-slate-500 mt-1 mb-6">No email or password required.</p>
+      <button id="enterAdminBtn" class="w-full h-12 rounded-2xl bg-[#07111f] text-white font-black">Enter Admin Panel</button>
+      <p class="text-[11px] text-slate-400 mt-5 text-center">This version uses local admin access. Add Firebase Authentication later if you need secure multi-user access.</p>
+    </div>
   </div>
-  <div id="reelsList" class="mt-5 space-y-3"></div>
- </div>
-</section>
 
-<section id="page-offers" class="page hidden">
- <div class="card p-5">
-  <div class="flex justify-between items-center"><div><h3 class="text-lg font-black">Home Offers</h3><p class="text-sm text-slate-500">Uses the existing <b>offers</b> Firestore collection.</p></div><button onclick="openOffer()" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-black">+ Add offer</button></div>
-  <div id="offersList" class="mt-5 space-y-3"></div>
- </div>
-</section>
+  <div id="app" class="hidden min-h-screen">
+    <div id="backdrop" class="fixed inset-0 bg-slate-950/45 z-40 hidden"></div>
+    <aside id="sidebar" class="drawer fixed lg:static inset-y-0 left-0 z-50 w-[280px] bg-[#07111f] text-white p-4 flex flex-col sidebar-fixed">
+      <div class="px-3 py-4 flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-white/10 border border-white/10 grid place-items-center font-black">TC</div>
+        <div><div class="wordmark text-base">TRENDCART <span class="amber">OFFICIAL</span></div><div class="text-[10px] text-white/45 font-bold tracking-widest mt-1">ADMIN CONSOLE</div></div>
+      </div>
+      <nav id="nav" class="space-y-1 mt-5 flex-1">
+        <button data-page="dashboard" class="nav-item nav-active w-full text-left px-4 py-3 rounded-2xl border border-transparent font-bold">⌂ <span class="ml-2">Dashboard</span></button>
+        <button data-page="reels" class="nav-item w-full text-left px-4 py-3 rounded-2xl border border-transparent font-bold">▶ <span class="ml-2">Reels & Videos</span></button>
+        <button data-page="products" class="nav-item w-full text-left px-4 py-3 rounded-2xl border border-transparent font-bold">▦ <span class="ml-2">Products</span></button>
+        <button data-page="offers" class="nav-item w-full text-left px-4 py-3 rounded-2xl border border-transparent font-bold">✦ <span class="ml-2">Offers & Posters</span></button>
+        <button data-page="orders" class="nav-item w-full text-left px-4 py-3 rounded-2xl border border-transparent font-bold">⌁ <span class="ml-2">Orders</span></button>
+        <button data-page="staff" class="nav-item w-full text-left px-4 py-3 rounded-2xl border border-transparent font-bold">♙ <span class="ml-2">Staff Access</span></button>
+      </nav>
+      <div class="glass-dark rounded-2xl p-3 text-xs">
+        <div id="staffName" class="font-black truncate">Staff</div><div id="staffRole" class="text-white/45 mt-1">Loading role…</div>
+        <button id="logoutBtn" class="mt-3 w-full rounded-xl bg-white/10 py-2 font-bold hover:bg-white/15">Sign out</button>
+      </div>
+    </aside>
 
-<section id="page-customers" class="page hidden">
- <div class="card p-5">
-  <h3 class="text-lg font-black">Customers from Orders</h3>
-  <p class="text-sm text-slate-500">Customer information is derived from the live orders because the storefront stores the delivery address inside each order.</p>
-  <div id="customersList" class="mt-5 space-y-3"></div>
- </div>
-</section>
-
-</div>
-</main>
-</div>
-
-<div id="productModal" class="modal fixed inset-0 z-40 bg-black/60 items-center justify-center p-4">
- <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
-  <div class="flex justify-between"><h2 id="productModalTitle" class="text-2xl font-black">Add Product</h2><button onclick="closeModal('productModal')" class="w-10 h-10 rounded-xl bg-slate-100">×</button></div>
-  <input type="hidden" id="productId">
-  <div class="grid md:grid-cols-2 gap-3 mt-5">
-   <input id="pName" placeholder="Product name" class="p-3 rounded-xl border">
-   <input id="pCategory" placeholder="Category" class="p-3 rounded-xl border">
-   <input id="pPrice" type="number" placeholder="Selling price" class="p-3 rounded-xl border">
-   <input id="pOriginal" type="number" placeholder="Original price" class="p-3 rounded-xl border">
-   <input id="pRating" type="number" step=".1" placeholder="Rating" class="p-3 rounded-xl border">
-   <input id="pImage" placeholder="Main image URL" class="p-3 rounded-xl border">
-   <input id="pImage2" placeholder="Image 2 (optional)" class="p-3 rounded-xl border">
-   <input id="pImage3" placeholder="Image 3 (optional)" class="p-3 rounded-xl border">
-   <input id="pImage4" placeholder="Image 4 (optional)" class="p-3 rounded-xl border">
-   <input id="pVideo" placeholder="Reel / video URL (optional)" class="p-3 rounded-xl border md:col-span-2">
+    <main class="lg:ml-0 min-w-0">
+      <header class="sticky top-0 z-30 safe-top glass border-x-0 border-t-0 rounded-none">
+        <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
+          <button id="menuBtn" class="mobile-menu w-11 h-11 rounded-2xl bg-slate-900 text-white">☰</button>
+          <div class="min-w-0 flex-1"><div class="flex items-center gap-2"><div id="pageTitle" class="font-black text-lg">Dashboard</div><span class="hidden sm:inline-flex px-2 py-1 rounded-full bg-cyan-50 text-cyan-700 text-[9px] font-black tracking-widest">2026 • V2</span></div><div id="pageSubtitle" class="text-xs text-slate-500">Store operations at a glance</div></div>
+          <div class="hidden sm:flex items-center gap-2 rounded-2xl bg-white/70 border border-slate-200 px-3 py-2 text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Firebase connected</div>
+          <button id="refreshBtn" class="w-11 h-11 rounded-2xl border border-slate-200 bg-white font-black">↻</button>
+        </div>
+      </header>
+      <div id="content" class="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto safe-bottom"></div>
+    </main>
   </div>
-  <textarea id="pDescription" rows="4" placeholder="Product description" class="w-full mt-3 p-3 rounded-xl border"></textarea>
-  <textarea id="pFeatures" rows="3" placeholder="Features — one per line" class="w-full mt-3 p-3 rounded-xl border"></textarea>
-  <div class="flex gap-5 mt-4 text-sm font-bold"><label><input id="pFeatured" type="checkbox"> Featured</label></div>
-  <button onclick="saveProduct()" class="w-full mt-5 h-12 rounded-xl bg-blue-600 text-white font-black">Save Product</button>
- </div>
-</div>
 
-<div id="offerModal" class="modal fixed inset-0 z-40 bg-black/60 items-center justify-center p-4">
- <div class="bg-white rounded-3xl w-full max-w-lg p-6">
-  <div class="flex justify-between"><h2 id="offerModalTitle" class="text-2xl font-black">Add Offer</h2><button onclick="closeModal('offerModal')" class="w-10 h-10 rounded-xl bg-slate-100">×</button></div>
-  <input type="hidden" id="offerId">
-  <input id="oTitle" placeholder="Offer title" class="w-full mt-5 p-3 rounded-xl border">
-  <input id="oBadge" placeholder="Badge e.g. 50% OFF" class="w-full mt-3 p-3 rounded-xl border">
-  <input id="oImage" placeholder="Poster image URL" class="w-full mt-3 p-3 rounded-xl border">
-  <input id="oUrl" placeholder="Offer URL (optional)" class="w-full mt-3 p-3 rounded-xl border">
-  <textarea id="oDescription" rows="3" placeholder="Offer description" class="w-full mt-3 p-3 rounded-xl border"></textarea>
-  <label class="block mt-3 text-sm font-bold"><input id="oActive" type="checkbox" checked> Active on Home</label>
-  <button onclick="saveOffer()" class="w-full mt-5 h-12 rounded-xl bg-blue-600 text-white font-black">Save Offer</button>
- </div>
-</div>
+  <div id="modal" class="modal fixed inset-0 z-[80] bg-slate-950/50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+    <div id="modalSheet" class="sheet bg-white w-full sm:max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-[2rem] sm:rounded-[2rem]"></div>
+  </div>
+  <div id="toast" class="fixed z-[100] left-1/2 bottom-7 -translate-x-1/2 pointer-events-none opacity-0 translate-y-4 transition-all"><div id="toastText" class="glass-dark text-white px-5 py-3 rounded-2xl text-sm font-bold"></div></div>
 
-<div id="orderModal" class="modal fixed inset-0 z-40 bg-black/60 items-center justify-center p-4">
- <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
-  <div class="flex justify-between"><h2 class="text-2xl font-black">Order details</h2><button onclick="closeModal('orderModal')" class="w-10 h-10 rounded-xl bg-slate-100">×</button></div>
-  <div id="orderDetails" class="mt-5"></div>
- </div>
-</div>
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc,
+  onSnapshot, query, orderBy, limit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import {getFirestore,collection,doc,addDoc,updateDoc,deleteDoc,onSnapshot,query,orderBy,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-const firebaseConfig={
- apiKey:"AIzaSyDzRVQyn5ZpKT6AmN_IMpgAuIltDh8nAh8",
- authDomain:"trendcart-official.firebaseapp.com",
- projectId:"trendcart-official",
- storageBucket:"trendcart-official.firebasestorage.app",
- messagingSenderId:"225931408532",
- appId:"1:225931408532:web:ea7595a1e80cd74347f081",
- measurementId:"G-L69LBH5H51"
+const firebaseConfig = {
+  apiKey: "AIzaSyDzRVQyn5ZpKT6AmN_IMpgAuIltDh8nAh8",
+  authDomain: "trendcart-official.firebaseapp.com",
+  projectId: "trendcart-official",
+  storageBucket: "trendcart-official.firebasestorage.app",
+  messagingSenderId: "225931408532",
+  appId: "1:225931408532:web:ea7595a1e80cd74347f081",
+  measurementId: "G-L69LBH5H51"
 };
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
-const $=id=>document.getElementById(id);
-const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(Number(n)||0);
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-let products=[],orders=[],offers=[],unsubs=[];
-let currentPage="dashboard";
 
-function closeModal(id){$(id).classList.remove("open")}
-window.closeModal=closeModal;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-function go(page){
- currentPage=page;
- document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));
- $("page-"+page).classList.remove("hidden");
- document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
- const titles={dashboard:["Dashboard","Live Firebase store control"],orders:["Orders","Customer orders and delivery details"],products:["Products","Live product catalog control"],reels:["Reels / Videos","Control the customer video feed"],offers:["Offers","Control the Home Offers section"],customers:["Customers","Customers derived from live orders"]};
- $("pageTitle").textContent=titles[page][0];$("pageSubtitle").textContent=titles[page][1];
- if(page==="orders")renderOrders();if(page==="products")renderProducts();if(page==="reels")renderReels();if(page==="offers")renderOffers();if(page==="customers")renderCustomers();
+const $ = id => document.getElementById(id);
+const money = n => new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(Number(n)||0);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const arr = v => Array.isArray(v) ? v : String(v||"").split(/\n|,/).map(x=>x.trim()).filter(Boolean);
+
+let currentUser = null, staffProfile = null, currentPage = "dashboard";
+let products = [], reels = [], offers = [], orders = [], staff = [];
+let unsub = [];
+
+function toast(msg){
+  $("toastText").textContent = msg; const t=$("toast");
+  t.classList.remove("opacity-0","translate-y-4"); t.classList.add("opacity-100","translate-y-0");
+  clearTimeout(window.__toast); window.__toast=setTimeout(()=>{t.classList.add("opacity-0","translate-y-4");t.classList.remove("opacity-100","translate-y-0")},2400);
 }
-window.go=go;
+function closeDrawer(){ $("sidebar").classList.remove("open"); $("backdrop").classList.add("hidden"); }
+function openDrawer(){ $("sidebar").classList.add("open"); $("backdrop").classList.remove("hidden"); }
+function openModal(html){ $("modalSheet").innerHTML=html; $("modal").classList.add("open"); }
+function closeModal(){ $("modal").classList.remove("open"); $("modalSheet").innerHTML=""; }
+function can(permission){
+  const role = staffProfile?.role || "viewer";
+  if(role === "admin") return true;
+  if(role === "manager") return permission !== "staff";
+  return ["dashboard","orders","reels","products","offers"].includes(permission);
+}
+function statusBadge(status){
+  const map={pending:"bg-amber-50 text-amber-700",processing:"bg-blue-50 text-blue-700",shipped:"bg-cyan-50 text-cyan-700",delivered:"bg-emerald-50 text-emerald-700",cancelled:"bg-red-50 text-red-700"};
+  return `<span class="px-2.5 py-1 rounded-full text-[11px] font-black uppercase ${map[status]||"bg-slate-100 text-slate-600"}">${esc(status||"pending")}</span>`;
+}
+function switchHtml(active, id){
+  return `<button type="button" class="switch ${active?'on':''}" data-switch="${id}" aria-label="Toggle"><i></i></button>`;
+}
+function empty(title, sub){return `<div class="glass rounded-3xl p-10 text-center"><div class="text-4xl">⌁</div><h3 class="font-black mt-3">${title}</h3><p class="text-sm text-slate-500 mt-1">${sub}</p></div>`}
 
-document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
-$("refreshBtn").onclick=()=>{renderDashboard();if(currentPage==="orders")renderOrders();if(currentPage==="products")renderProducts();if(currentPage==="reels")renderReels();if(currentPage==="offers")renderOffers();if(currentPage==="customers")renderCustomers()};
+async function loadCollections(){
+  const [p,r,o,s,ord] = await Promise.all([
+    getDocs(collection(db,"products")), getDocs(collection(db,"reels")), getDocs(collection(db,"offers")),
+    getDocs(collection(db,"staff")), getDocs(query(collection(db,"orders"),orderBy("createdAt","desc"),limit(300)))
+  ]);
+  products=p.docs.map(d=>({id:d.id,...d.data()}));
+  reels=r.docs.map(d=>({id:d.id,...d.data()}));
+  offers=o.docs.map(d=>({id:d.id,...d.data()}));
+  staff=s.docs.map(d=>({id:d.id,...d.data()}));
+  orders=ord.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+function statCard(label,value,icon,accent){
+  return `<div class="glass rounded-3xl p-5">
+    <div class="flex items-start justify-between"><div><div class="text-xs font-black uppercase tracking-widest text-slate-400">${label}</div><div class="text-2xl sm:text-3xl font-black mt-2">${value}</div></div>
+    <div class="w-11 h-11 rounded-2xl grid place-items-center text-white font-black" style="background:${accent}">${icon}</div></div>
+  </div>`;
+}
 
 function renderDashboard(){
- $("sOrders").textContent=orders.length;
- $("sPending").textContent=orders.filter(o=>o.status==="pending").length;
- $("sDelivered").textContent=orders.filter(o=>o.status==="delivered").length;
- $("sProducts").textContent=products.length;
- $("sSales").textContent=money(orders.reduce((a,o)=>a+Number(o.total||0),0));
- $("latestOrders").innerHTML=orders.slice(0,6).map(orderCompact).join("")||'<div class="py-8 text-center text-slate-400">No orders yet.</div>';
+  const sales=orders.reduce((s,o)=>s+Number(o.total||0),0);
+  const pending=orders.filter(o=>["pending","processing"].includes(o.status)).length;
+  const lowStock=products.filter(p=>Number(p.stock||0)>0 && Number(p.stock||0)<=5).length;
+  const outStock=products.filter(p=>Number(p.stock||0)<=0).length;
+  const visibleProducts=products.filter(p=>p.active!==false).length;
+  $("content").innerHTML=`<section class="fade space-y-6">
+    <div class="rounded-[2rem] p-6 sm:p-8 text-white overflow-hidden relative" style="background:linear-gradient(135deg,#07111f 0%,#0a2032 52%,#063d48 100%)">
+      <div class="absolute -right-16 -top-24 w-80 h-80 rounded-full bg-[#00A8BD]/20 blur-3xl"></div>
+      <div class="absolute right-24 bottom-[-100px] w-56 h-56 rounded-full bg-[#2563eb]/20 blur-3xl"></div>
+      <div class="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-7">
+        <div><div class="text-[10px] font-black uppercase tracking-[.3em] text-cyan-300">TRENDCART • STAFF CONTROL CENTER</div>
+        <h1 class="text-3xl sm:text-4xl font-black mt-2">Command your store.</h1>
+        <p class="text-white/55 mt-2 max-w-2xl">The new-generation operations panel for products, content, offers and orders — rebuilt from the classic admin workflow.</p></div>
+        <div class="glass-dark rounded-2xl p-4 min-w-[210px]"><div class="text-[10px] uppercase tracking-widest text-white/40 font-black">Store pulse</div>
+        <div class="flex items-center gap-2 mt-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_15px_rgba(52,211,153,.7)]"></span><span class="font-black">Operational</span></div>
+        <div class="text-xs text-white/40 mt-1">${pending} orders need attention</div></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
+      ${statCard("Total Sales",money(sales),"₹","#00A8BD")}
+      ${statCard("Total Orders",orders.length,"⌁","#2563eb")}
+      ${statCard("Visible Products",visibleProducts,"▦","#0f766e")}
+      ${statCard("Active Reels",reels.filter(x=>x.active!==false).length,"▶","#FFA800")}
+    </div>
+
+    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
+      <div class="glass rounded-2xl p-4"><div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Active Offers</div><div class="text-2xl font-black mt-1">${offers.filter(x=>x.active!==false).length}</div><div class="text-xs text-slate-400 mt-1">Homepage promotions</div></div>
+      <div class="glass rounded-2xl p-4"><div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Low Stock</div><div class="text-2xl font-black mt-1 text-amber-600">${lowStock}</div><div class="text-xs text-slate-400 mt-1">≤ 5 units remaining</div></div>
+      <div class="glass rounded-2xl p-4"><div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Out of Stock</div><div class="text-2xl font-black mt-1 text-red-600">${outStock}</div><div class="text-xs text-slate-400 mt-1">Needs inventory update</div></div>
+      <div class="glass rounded-2xl p-4"><div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Fulfillment</div><div class="text-2xl font-black mt-1">${pending}</div><div class="text-xs text-slate-400 mt-1">Pending / processing</div></div>
+    </div>
+
+    <div class="grid lg:grid-cols-[1.35fr_.65fr] gap-5">
+      <div class="glass rounded-3xl overflow-hidden">
+        <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+          <div><h2 class="font-black">Recent orders</h2><p class="text-xs text-slate-500 mt-1">Latest customer activity</p></div>
+          <button data-page-jump="orders" class="text-xs font-black text-blue-600">View all →</button>
+        </div>
+        <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-[11px] uppercase tracking-wider text-slate-400"><th class="p-4">Order</th><th class="p-4">Status</th><th class="p-4">Total</th></tr></thead><tbody>${orders.slice(0,7).map(o=>`<tr class="border-t border-slate-100 hover:bg-white/60"><td class="p-4 font-bold">${esc(o.id.slice(0,12))}…</td><td class="p-4">${statusBadge(o.status)}</td><td class="p-4 font-black">${money(o.total)}</td></tr>`).join("")||`<tr><td colspan="3" class="p-8 text-center text-slate-500">No orders yet.</td></tr>`}</tbody></table></div>
+      </div>
+      <div class="glass rounded-3xl p-5">
+        <div class="flex items-center justify-between"><div><h2 class="font-black">Quick actions</h2><p class="text-xs text-slate-500 mt-1">One-tap store controls</p></div><span class="text-xl">⚡</span></div>
+        <div class="grid gap-3 mt-4">
+          ${can("products")?`<button data-action="new-product" class="rounded-2xl bg-[#07111f] text-white p-4 text-left font-black hover:-translate-y-0.5 transition">＋ Add product <span class="block text-xs text-white/50 font-medium mt-1">Create a catalog item</span></button>`:""}
+          ${can("offers")?`<button data-action="new-offer" class="rounded-2xl bg-white border p-4 text-left font-black hover:-translate-y-0.5 transition">✦ New offer poster <span class="block text-xs text-slate-500 font-medium mt-1">Publish a homepage promotion</span></button>`:""}
+          ${can("reels")?`<button data-action="new-reel" class="rounded-2xl bg-white border p-4 text-left font-black hover:-translate-y-0.5 transition">▶ Add reel <span class="block text-xs text-slate-500 font-medium mt-1">Add video + product tag</span></button>`:""}
+        </div>
+      </div>
+    </div>
+  </section>`;
 }
-function orderCompact(o){return `<button onclick="openOrder('${o.id}')" class="w-full text-left border rounded-2xl p-4 hover:border-blue-400"><div class="flex justify-between gap-3"><div><b>${esc(o.id)}</b><p class="text-sm mt-1">${esc(o.address?.name||o.phone||o.userId||"Customer")}</p></div><span class="px-3 py-1 rounded-full bg-slate-100 text-xs font-black">${esc(o.status||"pending")}</span></div><div class="mt-2 text-sm">${o.items?.length||0} item(s) · <b>${money(o.total)}</b></div><div class="text-xs text-slate-500 mt-2">${esc(o.address?.address||o.address?.text||"Address saved with order")}</div></button>`}
-
-function renderOrders(){
- const q=($("orderSearch").value||"").toLowerCase(),f=$("orderStatusFilter").value;
- const list=orders.filter(o=>(!f||o.status===f)&&JSON.stringify(o).toLowerCase().includes(q));
- $("ordersList").innerHTML=list.map(o=>`<div class="card p-5"><div class="flex flex-wrap justify-between gap-3"><div><button onclick="openOrder('${o.id}')" class="font-black text-blue-600">${esc(o.id)}</button><p class="text-sm mt-1">${esc(o.address?.name||"Customer")} · ${esc(o.phone||o.address?.phone||"No phone")}</p></div><select onchange="changeOrderStatus('${o.id}',this.value)" class="p-2 rounded-lg border text-sm">${["pending","confirmed","processing","shipped","delivered"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></div><div class="mt-4 text-sm">${(o.items||[]).map(i=>`${esc(i.name)} × ${i.quantity} — ${money(i.price)}`).join("<br>")}</div><div class="mt-4 p-4 rounded-2xl bg-slate-50"><b>Delivery address</b><div class="text-sm mt-1">${esc(o.address?.name||"")}<br>${esc(o.address?.phone||o.phone||"")}<br>${esc(o.address?.address||o.address?.text||"Address not available")}</div></div><div class="mt-4 flex justify-between font-black"><span>Total</span><span>${money(o.total)}</span></div></div>`).join("")||'<div class="card p-10 text-center text-slate-400">No matching orders.</div>';
-}
-$("orderSearch").addEventListener("input",renderOrders);$("orderStatusFilter").addEventListener("change",renderOrders);
-
-window.openOrder=id=>{
- const o=orders.find(x=>x.id===id);if(!o)return;
- $("orderDetails").innerHTML=`<div class="space-y-4">
- <div class="p-4 rounded-2xl bg-slate-50"><b>Order</b><p class="mt-1">${esc(o.id)}</p><p class="text-sm text-slate-500">${esc(o.status||"pending")}</p></div>
- <div class="p-4 rounded-2xl border"><b>Customer</b><p class="mt-1">${esc(o.address?.name||"Customer")}</p><p>${esc(o.phone||o.address?.phone||"")}</p><p class="text-sm text-slate-500">${esc(o.userId||"")}</p></div>
- <div class="p-4 rounded-2xl border"><b>Delivery address</b><p class="mt-2 text-sm leading-6">${esc(o.address?.address||o.address?.text||"Address not available")}</p></div>
- <div class="p-4 rounded-2xl border"><b>Items</b><div class="mt-2 space-y-2">${(o.items||[]).map(i=>`<div class="flex justify-between text-sm"><span>${esc(i.name)} × ${i.quantity}</span><b>${money(Number(i.price||0)*Number(i.quantity||1))}</b></div>`).join("")}</div></div>
- <div class="flex justify-between text-lg font-black"><span>Total</span><span>${money(o.total)}</span></div></div>`;
- $("orderModal").classList.add("open");
-};
-
-window.changeOrderStatus=async(id,status)=>{
- const o=orders.find(x=>x.id===id);if(!o)return;
- await updateDoc(doc(db,"orders",id),{status,statusColor:status==="pending"?"yellow":"green",updatedAt:serverTimestamp()});
-};
-
-function openProduct(p=null){
- $("productModalTitle").textContent=p?"Edit Product":"Add Product";
- $("productId").value=p?.id||"";$("pName").value=p?.name||"";$("pCategory").value=p?.category||"";$("pPrice").value=p?.price??"";$("pOriginal").value=p?.originalPrice??"";$("pRating").value=p?.rating??"";$("pImage").value=p?.image||"";$("pImage2").value=p?.image2||"";$("pImage3").value=p?.image3||"";$("pImage4").value=p?.image4||"";$("pVideo").value=p?.videoUrl||"";$("pDescription").value=p?.description||"";$("pFeatures").value=Array.isArray(p?.features)?p.features.join("\n"):(p?.features||"");$("pFeatured").checked=!!p?.featured;
- $("productModal").classList.add("open");
-}
-window.openProduct=openProduct;
-
-window.saveProduct=async()=>{
- const data={name:$("pName").value.trim(),category:$("pCategory").value.trim(),price:Number($("pPrice").value||0),originalPrice:Number($("pOriginal").value||0),rating:Number($("pRating").value||0),image:$("pImage").value.trim(),image2:$("pImage2").value.trim(),image3:$("pImage3").value.trim(),image4:$("pImage4").value.trim(),videoUrl:$("pVideo").value.trim(),description:$("pDescription").value.trim(),features:$("pFeatures").value.split("\n").map(x=>x.trim()).filter(Boolean),featured:$("pFeatured").checked,updatedAt:serverTimestamp()};
- if(!data.name||!data.price)return alert("Product name and price are required");
- const id=$("productId").value;
- if(id)await updateDoc(doc(db,"products",id),data);else await addDoc(collection(db,"products"),{...data,createdAt:serverTimestamp()});
- closeModal("productModal");
-};
-
-function renderProducts(){
- const q=($("productSearch").value||"").toLowerCase();
- const list=products.filter(p=>`${p.name||""} ${p.category||""}`.toLowerCase().includes(q));
- $("productsList").innerHTML=list.map(p=>`<div class="border rounded-2xl overflow-hidden"><div class="relative"><img src="${esc(p.image||"https://placehold.co/600x600?text=Product")}" class="w-full aspect-square object-cover"><span class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-white/90 text-xs font-black">${p.featured?"FEATURED":"PRODUCT"}</span></div><div class="p-4"><b>${esc(p.name)}</b><p class="text-xs text-slate-500">${esc(p.category||"")}</p><div class="mt-2 font-black">${money(p.price)} ${p.originalPrice>p.price?`<span class="text-xs line-through text-slate-400">${money(p.originalPrice)}</span>`:""}</div><div class="mt-3 flex gap-2"><button onclick='openProduct(${JSON.stringify(p).replace(/'/g,"&#39;")})' class="flex-1 p-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-black">Edit</button><button onclick="deleteProduct('${p.id}')" class="p-2 rounded-lg bg-red-50 text-red-600 text-sm font-black">Delete</button></div></div></div>`).join("")||'<div class="col-span-full py-10 text-center text-slate-400">No products.</div>';
-}
-$("productSearch").addEventListener("input",renderProducts);
-window.deleteProduct=async id=>{if(confirm("Delete this product from the live store?"))await deleteDoc(doc(db,"products",id))};
 
 function renderReels(){
- $("reelProduct").innerHTML='<option value="">Select product</option>'+products.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
- $("reelsList").innerHTML=products.filter(p=>p.videoUrl).map(p=>`<div class="border rounded-2xl p-4 flex flex-col md:flex-row gap-4 md:items-center"><div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0"><img src="${esc(p.image||"https://placehold.co/100")}" class="w-full h-full object-cover"></div><div class="min-w-0 flex-1"><b>${esc(p.name)}</b><p class="text-xs text-slate-500 truncate">${esc(p.videoUrl)}</p></div><button onclick="removeReel('${p.id}')" class="px-3 py-2 rounded-lg bg-red-50 text-red-600 text-sm font-bold">Remove Reel</button></div>`).join("")||'<div class="py-8 text-center text-slate-400">No product reels configured.</div>';
+  $("content").innerHTML=`<section class="fade space-y-5"><div class="flex flex-wrap items-center justify-between gap-3"><div><h1 class="text-2xl font-black">Reels & Video Control Center</h1><p class="text-sm text-slate-500 mt-1">Manage short-form videos and direct product tagging.</p></div>${can("reels")?`<button data-action="new-reel" class="h-11 px-4 rounded-2xl bg-[#07111f] text-white font-black">＋ Add reel</button>`:""}</div>
+  <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">${reels.map(r=>`<article class="glass rounded-3xl overflow-hidden"><div class="aspect-[9/12] bg-slate-950 relative">${r.thumbnailUrl?`<img src="${esc(r.thumbnailUrl)}" class="w-full h-full object-cover" alt="">`:`<div class="w-full h-full grid place-items-center text-white/30 text-5xl">▶</div>`}<div class="absolute inset-x-3 top-3 flex justify-between"><span class="glass-dark text-white px-3 py-1 rounded-full text-[10px] font-black">${r.active===false?"INACTIVE":"ACTIVE"}</span>${r.productId?`<span class="glass-dark text-white px-3 py-1 rounded-full text-[10px] font-black">TAGGED</span>`:""}</div></div><div class="p-4"><h3 class="font-black truncate">${esc(r.title||"Untitled reel")}</h3><div class="text-xs text-slate-500 mt-1 truncate">${esc(r.videoUrl||"No video URL")}</div><div class="flex gap-4 mt-3 text-xs font-bold text-slate-500"><span>◉ ${Number(r.views||0).toLocaleString()}</span><span>♥ ${Number(r.likes||0).toLocaleString()}</span></div><div class="flex items-center justify-between mt-4">${switchHtml(r.active!==false,`reel:${r.id}`)}<div class="flex gap-2">${can("reels")?`<button data-action="edit-reel" data-id="${r.id}" class="px-3 py-2 rounded-xl border text-xs font-black">Edit</button><button data-action="delete-reel" data-id="${r.id}" class="px-3 py-2 rounded-xl bg-red-50 text-red-600 text-xs font-black">Delete</button>`:""}</div></div></div></article>`).join("")||empty("No reels","Add your first short video.")}</div></section>`;
 }
-window.saveReel=async()=>{const id=$("reelProduct").value,url=$("reelUrl").value.trim();if(!id||!url)return alert("Select a product and enter a video URL.");await updateDoc(doc(db,"products",id),{videoUrl:url,updatedAt:serverTimestamp()});$("reelUrl").value="";};
-window.removeReel=async id=>updateDoc(doc(db,"products",id),{videoUrl:"",updatedAt:serverTimestamp()});
 
-function openOffer(o=null){
- $("offerId").value=o?.id||"";$("oTitle").value=o?.title||o?.name||"";$("oBadge").value=o?.badge||o?.discount||"";$("oImage").value=o?.imageUrl||o?.image||"";$("oUrl").value=o?.offerUrl||o?.url||"";$("oDescription").value=o?.description||"";$("oActive").checked=o?.active!==false;$("offerModal").classList.add("open");
+function renderProducts(){
+  $("content").innerHTML=`<section class="fade space-y-5"><div class="flex flex-wrap items-center justify-between gap-3"><div><h1 class="text-2xl font-black">Products</h1><p class="text-sm text-slate-500 mt-1">Full catalog CRUD, stock and visibility controls.</p></div>${can("products")?`<button data-action="new-product" class="h-11 px-4 rounded-2xl bg-[#07111f] text-white font-black">＋ Add product</button>`:""}</div>
+  <div class="glass rounded-3xl p-3 sm:p-4 flex gap-3"><input id="productSearch" placeholder="Search products…" class="flex-1 h-11 rounded-2xl bg-slate-100 px-4 outline-none"><select id="stockFilter" class="h-11 rounded-2xl bg-slate-100 px-3 font-bold text-sm"><option value="all">All stock</option><option value="in">In stock</option><option value="out">Out of stock</option></select></div>
+  <div id="productList" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div></section>`;
+  renderProductList();
+  $("productSearch").oninput=renderProductList; $("stockFilter").onchange=renderProductList;
 }
-window.openOffer=openOffer;
-window.saveOffer=async()=>{
- const data={title:$("oTitle").value.trim(),badge:$("oBadge").value.trim(),imageUrl:$("oImage").value.trim(),offerUrl:$("oUrl").value.trim(),description:$("oDescription").value.trim(),active:$("oActive").checked,updatedAt:serverTimestamp()};
- if(!data.title)return alert("Offer title is required");
- const id=$("offerId").value;if(id)await updateDoc(doc(db,"offers",id),data);else await addDoc(collection(db,"offers"),{...data,createdAt:serverTimestamp()});closeModal("offerModal");
+function renderProductList(){
+  const q=($("productSearch")?.value||"").toLowerCase(), f=$("stockFilter")?.value||"all";
+  const list=products.filter(p=>(`${p.name||""} ${p.category||""}`.toLowerCase().includes(q))).filter(p=>f==="all"||(f==="in"&&Number(p.stock||0)>0)||(f==="out"&&Number(p.stock||0)<=0));
+  $("productList").innerHTML=list.map(p=>`<article class="glass rounded-3xl overflow-hidden"><div class="aspect-[4/3] bg-slate-100">${p.image?`<img src="${esc(p.image)}" class="w-full h-full object-cover" alt="${esc(p.name)}">`:`<div class="w-full h-full grid place-items-center text-slate-300 text-4xl">▦</div>`}</div><div class="p-4"><div class="flex items-start justify-between gap-2"><h3 class="font-black">${esc(p.name||"Unnamed")}</h3>${p.active===false?`<span class="text-[10px] font-black bg-slate-100 px-2 py-1 rounded-full">HIDDEN</span>`:`<span class="text-[10px] font-black bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full">VISIBLE</span>`}</div><div class="mt-2 text-lg font-black">${money(p.price)}</div><div class="text-xs text-slate-500 mt-1">Stock: <b>${Number(p.stock||0)}</b> · ${esc(p.category||"Uncategorized")}</div><div class="flex gap-2 mt-4">${can("products")?`<button data-action="edit-product" data-id="${p.id}" class="flex-1 py-2.5 rounded-xl border font-black text-xs">Edit</button><button data-action="toggle-product" data-id="${p.id}" class="py-2.5 px-3 rounded-xl bg-slate-100 font-black text-xs">${p.active===false?"Show":"Hide"}</button><button data-action="delete-product" data-id="${p.id}" class="py-2.5 px-3 rounded-xl bg-red-50 text-red-600 font-black text-xs">Delete</button>`:""}</div></div></article>`).join("")||empty("No products found","Try another search or add a product.") ;
+}
+
+function renderOffers(){
+  $("content").innerHTML=`<section class="fade space-y-5"><div class="flex flex-wrap items-center justify-between gap-3"><div><h1 class="text-2xl font-black">Offers & Posters</h1><p class="text-sm text-slate-500 mt-1">Firestore-compatible home offer schema: title, description, imageUrl, offerUrl, badge, active.</p></div>${can("offers")?`<button data-action="new-offer" class="h-11 px-4 rounded-2xl bg-[#07111f] text-white font-black">＋ Add offer</button>`:""}</div>
+  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${offers.map(o=>`<article class="glass rounded-3xl overflow-hidden"><div class="aspect-[16/8] bg-slate-100">${o.imageUrl?`<img src="${esc(o.imageUrl)}" class="w-full h-full object-cover" alt="${esc(o.title)}">`:`<div class="w-full h-full grid place-items-center text-slate-300 text-4xl">✦</div>`}</div><div class="p-4"><div class="flex justify-between gap-2"><span class="bg-[#FFA800] text-slate-950 px-2.5 py-1 rounded-full text-[10px] font-black uppercase">${esc(o.badge||"OFFER")}</span>${switchHtml(o.active!==false,`offer:${o.id}`)}</div><h3 class="font-black mt-3">${esc(o.title||"Untitled offer")}</h3><p class="text-sm text-slate-500 mt-1 line-clamp-2">${esc(o.description||"")}</p><div class="flex gap-2 mt-4">${can("offers")?`<button data-action="edit-offer" data-id="${o.id}" class="flex-1 py-2.5 rounded-xl border font-black text-xs">Edit</button><button data-action="delete-offer" data-id="${o.id}" class="py-2.5 px-3 rounded-xl bg-red-50 text-red-600 font-black text-xs">Delete</button>`:""}</div></div></article>`).join("")||empty("No offers","Create a poster to show on the store homepage.")}</div></section>`;
+}
+
+function renderOrders(){
+  $("content").innerHTML=`<section class="fade space-y-5"><div><h1 class="text-2xl font-black">Orders</h1><p class="text-sm text-slate-500 mt-1">Search orders and update fulfillment status.</p></div>
+  <div class="glass rounded-3xl p-3 flex flex-col sm:flex-row gap-3"><input id="orderSearch" placeholder="Search order ID or customer…" class="flex-1 h-11 rounded-2xl bg-slate-100 px-4 outline-none"><select id="orderStatusFilter" class="h-11 rounded-2xl bg-slate-100 px-3 font-bold text-sm"><option value="all">All statuses</option><option>pending</option><option>processing</option><option>shipped</option><option>delivered</option><option>cancelled</option></select></div>
+  <div class="glass rounded-3xl overflow-hidden"><div class="overflow-x-auto scrollbar"><table class="w-full min-w-[780px] text-sm"><thead><tr class="text-left text-[11px] uppercase tracking-wider text-slate-400 bg-white/50"><th class="p-4">Order</th><th class="p-4">Customer</th><th class="p-4">Items</th><th class="p-4">Total</th><th class="p-4">Status</th><th class="p-4">Update</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div></section>`;
+  renderOrderList(); $("orderSearch").oninput=renderOrderList; $("orderStatusFilter").onchange=renderOrderList;
+}
+function renderOrderList(){
+  const q=($("orderSearch")?.value||"").toLowerCase(), f=$("orderStatusFilter")?.value||"all";
+  const list=orders.filter(o=>(`${o.id} ${o.phone||""} ${o.userId||""}`).toLowerCase().includes(q)).filter(o=>f==="all"||o.status===f);
+  $("ordersBody").innerHTML=list.map(o=>`<tr class="border-t border-slate-100"><td class="p-4 font-black">${esc(o.id)}</td><td class="p-4"><div class="font-bold">${esc(o.phone||o.userId||"Customer")}</div><div class="text-xs text-slate-400">${esc(o.address?.name||"")}</div></td><td class="p-4">${o.items?.length||0}</td><td class="p-4 font-black">${money(o.total)}</td><td class="p-4">${statusBadge(o.status)}</td><td class="p-4"><select data-order-status="${o.id}" class="h-9 rounded-xl border bg-white px-2 text-xs font-bold"><option ${o.status==="pending"?"selected":""}>pending</option><option ${o.status==="processing"?"selected":""}>processing</option><option ${o.status==="shipped"?"selected":""}>shipped</option><option ${o.status==="delivered"?"selected":""}>delivered</option><option ${o.status==="cancelled"?"selected":""}>cancelled</option></select></td></tr>`).join("")||`<tr><td colspan="6" class="p-10 text-center text-slate-500">No matching orders.</td></tr>`;
+}
+
+function renderStaff(){
+  $("content").innerHTML=`<section class="fade space-y-5"><div class="flex flex-wrap items-center justify-between gap-3"><div><h1 class="text-2xl font-black">Staff Access Control</h1><p class="text-sm text-slate-500 mt-1">Role-based UI for admin, manager and viewer staff accounts.</p></div>${can("staff")?`<button data-action="new-staff" class="h-11 px-4 rounded-2xl bg-[#07111f] text-white font-black">＋ Add staff record</button>`:""}</div>
+  <div class="glass rounded-3xl overflow-hidden"><div class="overflow-x-auto"><table class="w-full min-w-[650px] text-sm"><thead><tr class="text-left text-[11px] uppercase tracking-wider text-slate-400"><th class="p-4">Name</th><th class="p-4">Email</th><th class="p-4">Role</th><th class="p-4">Active</th><th class="p-4">Actions</th></tr></thead><tbody>${staff.map(s=>`<tr class="border-t border-slate-100"><td class="p-4 font-black">${esc(s.name||"Staff")}</td><td class="p-4">${esc(s.email||"—")}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full bg-slate-100 text-xs font-black uppercase">${esc(s.role||"viewer")}</span></td><td class="p-4">${s.active===false?"No":"Yes"}</td><td class="p-4">${can("staff")?`<button data-action="edit-staff" data-id="${s.id}" class="px-3 py-2 rounded-xl border text-xs font-black">Edit</button>`:"—"}</td></tr>`).join("")||`<tr><td colspan="5" class="p-10 text-center text-slate-500">No staff records.</td></tr>`}</tbody></table></div></div>
+  <div class="glass rounded-3xl p-5 text-sm text-slate-600"><b>Important:</b> creating a Firebase Authentication user is intentionally separate from this Firestore role record. Create the Auth user in Firebase Console/Admin SDK, then add a <code class="font-mono">staff/{uid}</code> document with <code class="font-mono">role</code> and <code class="font-mono">active</code>.</div></section>`;
+}
+
+function render(){
+  const titles={dashboard:["Dashboard","Store operations at a glance"],reels:["Reels & Videos","Short-form content control"],products:["Products","Catalog and inventory"],offers:["Offers & Posters","Homepage promotions"],orders:["Orders","Fulfillment management"],staff:["Staff Access","Role-based permissions"]};
+  $("pageTitle").textContent=titles[currentPage][0]; $("pageSubtitle").textContent=titles[currentPage][1];
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("nav-active",b.dataset.page===currentPage));
+  ({dashboard:renderDashboard,reels:renderReels,products:renderProducts,offers:renderOffers,orders:renderOrders,staff:renderStaff}[currentPage])();
+}
+
+function productForm(p={}){
+ return `<form id="entityForm" class="p-5 sm:p-7 space-y-4"><div class="flex items-center justify-between"><div><h2 class="text-xl font-black">${p.id?"Edit":"Add"} product</h2><p class="text-xs text-slate-500 mt-1">Uses the store's existing products collection.</p></div><button type="button" data-close-modal class="w-10 h-10 rounded-xl bg-slate-100">×</button></div>
+ <input type="hidden" name="id" value="${esc(p.id)}"><div class="grid sm:grid-cols-2 gap-3">
+ <label class="text-xs font-black">Name<input name="name" required value="${esc(p.name)}" class="field"></label>
+ <label class="text-xs font-black">Category<input name="category" value="${esc(p.category)}" class="field"></label>
+ <label class="text-xs font-black">Price<input name="price" type="number" min="0" required value="${Number(p.price||0)}" class="field"></label>
+ <label class="text-xs font-black">Original price<input name="originalPrice" type="number" min="0" value="${Number(p.originalPrice||0)}" class="field"></label>
+ <label class="text-xs font-black">Stock<input name="stock" type="number" min="0" value="${Number(p.stock||0)}" class="field"></label>
+ <label class="text-xs font-black">Main image URL<input name="image" type="url" value="${esc(p.image)}" class="field"></label>
+ </div><label class="text-xs font-black block">Gallery image URLs<textarea name="gallery" rows="3" class="field" placeholder="One URL per line">${esc((p.gallery||[]).join("\n"))}</textarea></label>
+ <label class="text-xs font-black block">Features<textarea name="features" rows="4" class="field" placeholder="One feature per line">${esc((p.features||[]).join("\n"))}</textarea></label>
+ <label class="text-xs font-black block">Description<textarea name="description" rows="4" class="field">${esc(p.description)}</textarea></label>
+ <div class="flex justify-end gap-2 pt-2"><button type="button" data-close-modal class="px-4 py-3 rounded-xl border font-bold">Cancel</button><button class="px-5 py-3 rounded-xl bg-[#07111f] text-white font-black">Save product</button></div></form>`;
+}
+function offerForm(o={}){
+ return `<form id="entityForm" class="p-5 sm:p-7 space-y-4"><div class="flex items-center justify-between"><div><h2 class="text-xl font-black">${o.id?"Edit":"Add"} offer</h2><p class="text-xs text-slate-500 mt-1">Firestore fields: title, description, imageUrl, offerUrl, badge, active.</p></div><button type="button" data-close-modal class="w-10 h-10 rounded-xl bg-slate-100">×</button></div>
+ <input type="hidden" name="id" value="${esc(o.id)}"><input name="title" required placeholder="Title" value="${esc(o.title)}" class="field">
+ <textarea name="description" placeholder="Description" class="field" rows="3">${esc(o.description)}</textarea>
+ <input name="imageUrl" type="url" placeholder="Poster image URL" value="${esc(o.imageUrl)}" class="field">
+ <input name="offerUrl" type="url" placeholder="Offer destination URL" value="${esc(o.offerUrl)}" class="field">
+ <div class="grid sm:grid-cols-2 gap-3"><input name="badge" placeholder="Badge e.g. 50% OFF" value="${esc(o.badge)}" class="field"><select name="active" class="field"><option value="true" ${o.active!==false?"selected":""}>Active</option><option value="false" ${o.active===false?"selected":""}>Inactive</option></select></div>
+ <div class="flex justify-end gap-2"><button type="button" data-close-modal class="px-4 py-3 rounded-xl border font-bold">Cancel</button><button class="px-5 py-3 rounded-xl bg-[#07111f] text-white font-black">Save offer</button></div></form>`;
+}
+function reelForm(r={}){
+ return `<form id="entityForm" class="p-5 sm:p-7 space-y-4"><div class="flex items-center justify-between"><div><h2 class="text-xl font-black">${r.id?"Edit":"Add"} reel</h2><p class="text-xs text-slate-500 mt-1">Short video URL + direct product tag.</p></div><button type="button" data-close-modal class="w-10 h-10 rounded-xl bg-slate-100">×</button></div>
+ <input type="hidden" name="id" value="${esc(r.id)}"><input name="title" required placeholder="Video title" value="${esc(r.title)}" class="field">
+ <input name="videoUrl" required type="url" placeholder="Video URL" value="${esc(r.videoUrl)}" class="field">
+ <input name="thumbnailUrl" type="url" placeholder="Thumbnail URL (optional)" value="${esc(r.thumbnailUrl)}" class="field">
+ <div class="grid sm:grid-cols-3 gap-3"><input name="views" type="number" min="0" placeholder="Views" value="${Number(r.views||0)}" class="field"><input name="likes" type="number" min="0" placeholder="Likes" value="${Number(r.likes||0)}" class="field"><select name="productId" class="field"><option value="">No product tag</option>${products.map(p=>`<option value="${p.id}" ${r.productId===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></div>
+ <select name="active" class="field"><option value="true" ${r.active!==false?"selected":""}>Active</option><option value="false" ${r.active===false?"selected":""}>Inactive</option></select>
+ <div class="flex justify-end gap-2"><button type="button" data-close-modal class="px-4 py-3 rounded-xl border font-bold">Cancel</button><button class="px-5 py-3 rounded-xl bg-[#07111f] text-white font-black">Save reel</button></div></form>`;
+}
+function staffForm(s={}){
+ return `<form id="entityForm" class="p-5 sm:p-7 space-y-4"><div class="flex items-center justify-between"><div><h2 class="text-xl font-black">${s.id?"Edit":"Add"} staff record</h2><p class="text-xs text-slate-500 mt-1">Use the Firebase Auth UID as the document ID for production.</p></div><button type="button" data-close-modal class="w-10 h-10 rounded-xl bg-slate-100">×</button></div>
+ <input name="id" required placeholder="Firebase Auth UID" value="${esc(s.id)}" class="field"><input name="name" required placeholder="Name" value="${esc(s.name)}" class="field"><input name="email" type="email" placeholder="Email" value="${esc(s.email)}" class="field">
+ <select name="role" class="field"><option value="viewer" ${s.role==="viewer"?"selected":""}>Viewer</option><option value="manager" ${s.role==="manager"?"selected":""}>Manager</option><option value="admin" ${s.role==="admin"?"selected":""}>Admin</option></select>
+ <select name="active" class="field"><option value="true" ${s.active!==false?"selected":""}>Active</option><option value="false" ${s.active===false?"selected":""}>Inactive</option></select>
+ <div class="flex justify-end gap-2"><button type="button" data-close-modal class="px-4 py-3 rounded-xl border font-bold">Cancel</button><button class="px-5 py-3 rounded-xl bg-[#07111f] text-white font-black">Save staff role</button></div></form>`;
+}
+
+const style = document.createElement("style");
+style.textContent = `.field{display:block;width:100%;margin-top:7px;height:46px;border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:0 13px;outline:none}.field:focus{box-shadow:0 0 0 4px rgba(0,168,189,.10);border-color:#00A8BD}textarea.field{height:auto;padding-top:11px;padding-bottom:11px}`;
+document.head.appendChild(style);
+
+async function saveEntity(type, form){
+  const d=Object.fromEntries(new FormData(form).entries());
+  try{
+    if(type==="product"){
+      const payload={name:d.name,category:d.category,price:Number(d.price||0),originalPrice:Number(d.originalPrice||0),stock:Number(d.stock||0),image:d.image||"",gallery:arr(d.gallery),features:arr(d.features),description:d.description||"",active:true,updatedAt:serverTimestamp()};
+      if(d.id) await updateDoc(doc(db,"products",d.id),payload); else await addDoc(collection(db,"products"),{...payload,createdAt:serverTimestamp()});
+      toast("Product saved");
+    } else if(type==="offer"){
+      const payload={title:d.title,description:d.description||"",imageUrl:d.imageUrl||"",offerUrl:d.offerUrl||"",badge:d.badge||"OFFER",active:d.active==="true",updatedAt:serverTimestamp()};
+      if(d.id) await updateDoc(doc(db,"offers",d.id),payload); else await addDoc(collection(db,"offers"),{...payload,createdAt:serverTimestamp()});
+      toast("Offer saved");
+    } else if(type==="reel"){
+      const payload={title:d.title,videoUrl:d.videoUrl,thumbnailUrl:d.thumbnailUrl||"",views:Number(d.views||0),likes:Number(d.likes||0),productId:d.productId||"",active:d.active==="true",updatedAt:serverTimestamp()};
+      if(d.id) await updateDoc(doc(db,"reels",d.id),payload); else await addDoc(collection(db,"reels"),{...payload,createdAt:serverTimestamp()});
+      toast("Reel saved");
+    } else if(type==="staff"){
+      await setDoc(doc(db,"staff",d.id),{name:d.name,email:d.email||"",role:d.role,active:d.active==="true",updatedAt:serverTimestamp()},{merge:true});
+      toast("Staff role saved");
+    }
+    closeModal(); await loadCollections(); render();
+  }catch(e){console.error(e);toast("Save failed: "+(e.code||"permission error"))}
+}
+
+document.addEventListener("click", async e=>{
+  const page=e.target.closest("[data-page]")?.dataset.page;
+  if(page){currentPage=page;closeDrawer();render();return}
+  const jump=e.target.closest("[data-page-jump]")?.dataset.pageJump;if(jump){currentPage=jump;render();return}
+  if(e.target.closest("[data-close-modal]")){closeModal();return}
+  const action=e.target.closest("[data-action]")?.dataset.action,id=e.target.closest("[data-action]")?.dataset.id;
+  if(action==="new-product")openModal(productForm());
+  if(action==="edit-product")openModal(productForm(products.find(x=>x.id===id)||{}));
+  if(action==="delete-product" && confirm("Delete this product?")){await deleteDoc(doc(db,"products",id));toast("Product deleted");await loadCollections();render();}
+  if(action==="toggle-product"){const p=products.find(x=>x.id===id);await updateDoc(doc(db,"products",id),{active:p.active===false,updatedAt:serverTimestamp()});await loadCollections();render();toast("Visibility updated");}
+  if(action==="new-offer")openModal(offerForm());
+  if(action==="edit-offer")openModal(offerForm(offers.find(x=>x.id===id)||{}));
+  if(action==="delete-offer" && confirm("Delete this offer?")){await deleteDoc(doc(db,"offers",id));toast("Offer deleted");await loadCollections();render();}
+  if(action==="new-reel")openModal(reelForm());
+  if(action==="edit-reel")openModal(reelForm(reels.find(x=>x.id===id)||{}));
+  if(action==="delete-reel" && confirm("Delete this reel?")){await deleteDoc(doc(db,"reels",id));toast("Reel deleted");await loadCollections();render();}
+  if(action==="new-staff")openModal(staffForm());
+  if(action==="edit-staff")openModal(staffForm(staff.find(x=>x.id===id)||{}));
+});
+document.addEventListener("change",async e=>{
+  const sw=e.target.closest("[data-switch]"); if(sw)return;
+  const orderId=e.target.dataset.orderStatus;
+  if(orderId){await updateDoc(doc(db,"orders",orderId),{status:e.target.value,updatedAt:serverTimestamp()});const o=orders.find(x=>x.id===orderId);if(o)o.status=e.target.value;toast("Order status updated");renderOrderList();}
+});
+document.addEventListener("submit",async e=>{
+  if(e.target.id!=="entityForm")return;e.preventDefault();
+  const title=$("modalSheet").querySelector("h2")?.textContent?.toLowerCase()||"";
+  await saveEntity(title.includes("product")?"product":title.includes("offer")?"offer":title.includes("reel")?"reel":"staff",e.target);
+});
+document.addEventListener("click",async e=>{
+  const sw=e.target.closest("[data-switch]"); if(!sw)return;
+  const [type,id]=sw.dataset.switch.split(":"); const list=type==="reel"?reels:offers; const item=list.find(x=>x.id===id); if(!item)return;
+  await updateDoc(doc(db,type==="reel"?"reels":"offers",id),{active:item.active===false,updatedAt:serverTimestamp()}); await loadCollections(); render(); toast("Status updated");
+});
+$("modal").addEventListener("click",e=>{if(e.target===$("modal"))closeModal()});
+$("menuBtn").onclick=openDrawer;$("backdrop").onclick=closeDrawer;$("refreshBtn").onclick=async()=>{await loadCollections();render();toast("Data refreshed")};
+$("logoutBtn").onclick=()=>{ $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden"); };
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").classList.add("hidden");try{await signInWithEmailAndPassword(auth,$("loginEmail").value,$("loginPassword").value)}catch(err){$("loginError").textContent=err.message;$("loginError").classList.remove("hidden")}};
+
+document.getElementById("enterAdminBtn").onclick = async () => {
+  currentUser = { uid: "local-admin", email: "admin@trendcart.local" };
+  staffProfile = { id: "local-admin", name: "Administrator", role: "admin", active: true };
+  $("staffName").textContent = "Administrator";
+  $("staffRole").textContent = "ADMIN";
+  $("loginScreen").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  try { await loadCollections(); } catch(e) { console.warn("Firestore unavailable; starting with empty data.", e); }
+  render();
 };
-function renderOffers(){$("offersList").innerHTML=offers.map(o=>`<div class="border rounded-2xl p-4 flex flex-col md:flex-row gap-4 md:items-center"><div class="w-28 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">${o.imageUrl?`<img src="${esc(o.imageUrl)}" class="w-full h-full object-cover">`:""}</div><div class="flex-1"><b>${esc(o.title||o.name||"Offer")}</b><p class="text-xs text-slate-500">${esc(o.description||"")}</p><span class="text-xs font-black">${o.active===false?"INACTIVE":"ACTIVE"} · ${esc(o.badge||"OFFER")}</span></div><div class="flex gap-2"><button onclick='openOffer(${JSON.stringify(o).replace(/'/g,"&#39;")})' class="px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-bold">Edit</button><button onclick="deleteOffer('${o.id}')" class="px-3 py-2 rounded-lg bg-red-50 text-red-600 text-sm font-bold">Delete</button></div></div>`).join("")||'<div class="py-8 text-center text-slate-400">No offers.</div>'}
-window.deleteOffer=async id=>{if(confirm("Delete this live offer?"))await deleteDoc(doc(db,"offers",id))};
 
-function renderCustomers(){
- const map=new Map();
- orders.forEach(o=>{const key=o.userId||o.phone||o.address?.phone||o.address?.name||o.id;if(!map.has(key))map.set(key,{key,name:o.address?.name||"Customer",phone:o.phone||o.address?.phone||"",orders:[]});map.get(key).orders.push(o)});
- $("customersList").innerHTML=[...map.values()].map(c=>`<div class="border rounded-2xl p-4"><div class="flex flex-wrap justify-between gap-3"><div><b>${esc(c.name)}</b><p class="text-sm text-slate-500">${esc(c.phone)}</p></div><span class="px-3 py-1 rounded-full bg-slate-100 text-xs font-black">${c.orders.length} order(s)</span></div><div class="mt-4 space-y-2">${c.orders.map(o=>`<button onclick="openOrder('${o.id}')" class="w-full text-left bg-slate-50 rounded-xl p-3 text-sm"><b>${esc(o.id)}</b> · ${money(o.total)}<br><span class="text-slate-500">${esc(o.address?.address||o.address?.text||"No address")}</span></button>`).join("")}</div></div>`).join("")||'<div class="py-8 text-center text-slate-400">No customers yet.</div>';
-}
+</script>
 
-function startLive(){
- unsubs.forEach(fn=>fn&&fn());unsubs=[];
- unsubs.push(onSnapshot(collection(db,"products"),s=>{products=s.docs.map(d=>({id:d.id,...d.data()}));$("live").classList.remove("hidden");renderDashboard();if(currentPage==="products")renderProducts();if(currentPage==="reels")renderReels()}));
- unsubs.push(onSnapshot(query(collection(db,"orders"),orderBy("createdAt","desc")),s=>{orders=s.docs.map(d=>({id:d.id,...d.data()}));renderDashboard();if(currentPage==="orders")renderOrders();if(currentPage==="customers")renderCustomers()}));
- unsubs.push(onSnapshot(collection(db,"offers"),s=>{offers=s.docs.map(d=>({id:d.id,...d.data()}));if(currentPage==="offers")renderOffers()}));
-}
-
-$("loginBtn").onclick=async()=>{
- $("loginError").textContent="";
- try{await signInWithEmailAndPassword(auth,$("adminEmail").value.trim(),$("adminPassword").value); }
- catch(e){$("loginError").textContent=e.message||"Sign-in failed."}
-};
-$("logoutBtn").onclick=()=>signOut(auth);
-onAuthStateChanged(auth,user=>{
- $("loginGate").style.display=user?"none":"flex";
- if(user){startLive();go("dashboard")}else{unsubs.forEach(fn=>fn&&fn());unsubs=[]}
+<script>
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    const search = document.querySelector("#productSearch, #orderSearch");
+    if (search) { search.focus(); search.scrollIntoView({behavior:"smooth", block:"center"}); }
+  }
 });
 </script>
 </body>
