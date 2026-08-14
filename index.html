@@ -100,6 +100,7 @@
 
   <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-messaging.js";
 import {
   getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
@@ -577,7 +578,7 @@ async function setupTrendcartPushNotifications() {
   }
 
   try {
-    const supported = await isSupported();
+    const supported = typeof isSupported === "function" ? await isSupported() : false;
     if (!supported) {
       if (state) state.textContent = "Firebase Web Push is not supported on this device/browser.";
       return false;
